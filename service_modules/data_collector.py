@@ -8,6 +8,7 @@ import json
 import pprint
 import requests
 from enum import Enum
+from typing import Union
 from ast import literal_eval
 from dotenv import load_dotenv
 from requests.exceptions import JSONDecodeError
@@ -15,6 +16,54 @@ from requests.exceptions import JSONDecodeError
 
 load_dotenv()
 
+
+class CollectorBase:
+    """
+    This class is responsible for containing the base class for all collectors.
+
+    NOTE: This is made for future development opstions for multiper API support.
+    """
+    def __init__(self, api_key: str, base_url: str, collector_type: str):
+        self.api_key = None
+        self.base_url = None
+        self.collector_type = None
+
+    def my_type(self) -> str:
+        """
+        This method is responsible for returning the collector type.
+        """
+        return self.collector_type
+    
+    def make_request(self, endpoint: str, method: str, mock: bool = True) -> dict:
+        """
+        This method is responsible for making a request to the Alpha Vantage API.
+
+        Params:
+            endpoint: str - The endpoint to make the request to.
+            method: str - The method to make the request with. NOTE: This is made for future development opstions.
+            mock: bool - Whether to use the mock data.
+
+        Returns:
+            dict - The response from the request.
+        """
+        response = None
+
+        try:
+            if mock:
+                response = self._mock_data()
+                return response
+            else:
+                response = requests.request(method, endpoint)
+                # response = requests.get(endpoint)
+                return response.json()
+        except JSONDecodeError as e:
+            raise JSONDecodeError(e)
+        except requests.RequestException as e:
+            raise requests.RequestException(e)
+        except Exception as e:
+            raise Exception(f"Unexpected error: {e}")
+        
+    
 
 class DataCollector:
     """
@@ -26,7 +75,15 @@ class DataCollector:
         """
         self.data_collector = self._get_collector(collector_type)
 
-    def _get_collector(self, collector_type: str):
+    def what_collector(self) -> str:
+        """
+        This method is responsible for returning the collector type.
+        """
+        return self.data_collector.my_type()
+
+    def _get_collector(self, collector_type: str) -> Union['DataCollector.StockDataCollector', \
+                                                           'DataCollector.CryptoDataCollector', \
+                                                            'DataCollector.CommodityDataCollector']:
         """
         This method is responsible for getting the collector type.
         NOTE: This is made for future development opstions.
@@ -57,13 +114,14 @@ class DataCollector:
         COMMODITY = "commodity"
 
 
-    class StockDataCollector:
+    class StockDataCollector(CollectorBase):
         """
         This class is responsible for collecting data from the Alpha Vantage API for stocks.
         """
         def __init__(self):
             self.api_key = os.getenv("ALPHAVANTAGE_API_KEY")
             self.base_url = "https://www.alphavantage.co/query"
+            self.collector_type = DataCollector.DataCollectionType.STOCK
             self.daily_endpoint = "{base}?function=TIME_SERIES_DAILY&symbol={symbol}&apikey={key}".format(base=self.base_url, symbol="{}", key=self.api_key)
             self.daily_endpoint = "{base}?function=TIME_SERIES_WEEKLY&symbol={symbol}&apikey={key}".format(base=self.base_url, symbol="{}", key=self.api_key)
             self.daily_endpoint = "{base}?function=TIME_SERIES_MONTHLY&symbol={symbol}&apikey={key}".format(base=self.base_url, symbol="{}", key=self.api_key)
@@ -75,35 +133,6 @@ class DataCollector:
                 proper_string = literal_eval(f"'{exmp_req_data}'")
             proper_string = json.loads(proper_string.encode("utf-8"))
             return proper_string
-
-        def make_request(self, endpoint: str, method: str, mock: bool = True) -> dict:
-            """
-            This method is responsible for making a request to the Alpha Vantage API.
-
-            Params:
-                endpoint: str - The endpoint to make the request to.
-                method: str - The method to make the request with. NOTE: This is made for future development opstions.
-                mock: bool - Whether to use the mock data.
-
-            Returns:
-                dict - The response from the request.
-            """
-            response = None
-
-            try:
-                if mock:
-                    response = self._mock_data()
-                    return response
-                else:
-                    response = requests.request(method, endpoint)
-                    # response = requests.get(endpoint)
-                    return response.json()
-            except JSONDecodeError as e:
-                raise JSONDecodeError(e)
-            except requests.RequestException as e:
-                raise requests.RequestException(e)
-            except Exception as e:
-                raise Exception(f"Unexpected error: {e}")
 
         def get_daily_data(self, symbol: str, method: str = "GET") -> dict:
             """
