@@ -1,0 +1,18 @@
+
+
+
+ARCHITECTURE
+
+I. DataCollector
+
+II. DataProcessor
+
+III. REST API
+
+
+TECHNOLOGIES
+
+python
+FastAPI
+PostgreSQL
+Docker
