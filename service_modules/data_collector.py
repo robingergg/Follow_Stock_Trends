@@ -28,13 +28,13 @@ class CollectorBase:
         self.base_url = None
         self.collector_type = None
 
-    def my_type(self) -> str:
+    def _my_type(self) -> str:
         """
         This method is responsible for returning the collector type.
         """
         return self.collector_type
     
-    def make_request(self, endpoint: str, method: str, mock: bool = True) -> dict:
+    def make_request(self, endpoint: str, method: str, mock: str = None) -> dict:
         """
         This method is responsible for making a request to the Alpha Vantage API.
 
@@ -50,7 +50,7 @@ class CollectorBase:
 
         try:
             if mock:
-                response = self._mock_data()
+                response = self._mock_data(mock)
                 return response
             else:
                 response = requests.request(method, endpoint)
@@ -65,7 +65,7 @@ class CollectorBase:
         
     
 
-class DataCollector:
+class DataCollector(CollectorBase):
     """
     This class is responsible for containing different types of data collector classes.
     """
@@ -78,8 +78,9 @@ class DataCollector:
     def what_collector(self) -> str:
         """
         This method is responsible for returning the collector type.
+        Help identify the type of collector. This migth be useful in case of many collector types.
         """
-        return self.data_collector.my_type()
+        return self.data_collector._my_type()
 
     def _get_collector(self, collector_type: str) -> Union['DataCollector.StockDataCollector', \
                                                            'DataCollector.CryptoDataCollector', \
@@ -123,12 +124,15 @@ class DataCollector:
             self.base_url = "https://www.alphavantage.co/query"
             self.collector_type = DataCollector.DataCollectionType.STOCK
             self.daily_endpoint = "{base}?function=TIME_SERIES_DAILY&symbol={symbol}&apikey={key}".format(base=self.base_url, symbol="{}", key=self.api_key)
-            self.daily_endpoint = "{base}?function=TIME_SERIES_WEEKLY&symbol={symbol}&apikey={key}".format(base=self.base_url, symbol="{}", key=self.api_key)
-            self.daily_endpoint = "{base}?function=TIME_SERIES_MONTHLY&symbol={symbol}&apikey={key}".format(base=self.base_url, symbol="{}", key=self.api_key)
+            self.weekly_endpoint = "{base}?function=TIME_SERIES_WEEKLY&symbol={symbol}&apikey={key}".format(base=self.base_url, symbol="{}", key=self.api_key)
+            self.monthly_endpoint = "{base}?function=TIME_SERIES_MONTHLY&symbol={symbol}&apikey={key}".format(base=self.base_url, symbol="{}", key=self.api_key)
 
-        def _mock_data(self) -> dict:
+        def _mock_data(self, mock: str) -> dict:
+            """
+            mock: str - The mock data to use. It is the path to the mock data file, eg: "Monthly_data.txt"
+            """
             exmp_req_data = None
-            with open("exmp_binary_data.txt", "r") as f:
+            with open(f"{mock}", "r") as f:
                 exmp_req_data = f.read()
                 proper_string = literal_eval(f"'{exmp_req_data}'")
             proper_string = json.loads(proper_string.encode("utf-8"))
@@ -146,6 +150,25 @@ class DataCollector:
             """
             endpoint = self.daily_endpoint.format(symbol)
             return self.make_request(endpoint, method)
+        
+        def get_weekly_data(self, symbol: str, method: str = "GET") -> dict:
+            """
+            This method is responsible for getting the weekly data for a given symbol.
+            """
+            endpoint = self.weekly_endpoint.format(symbol)
+            return self.make_request(endpoint, method)
+        
+        def get_monthly_data(self, symbol: str, method: str = "GET", mock: str = None) -> dict:
+            """
+            This method is responsible for getting the monthly data for a given symbol.
+            """
+            endpoint = self.monthly_endpoint.format(symbol)
+            return self.make_request(endpoint, method, mock)
 
 
-pprint.pprint(DataCollector("stock").data_collector.get_daily_data("IBM"))
+if __name__ == "__main__":
+    import itertools
+    # pprint.pprint(DataCollector("stock").data_collector.get_daily_data("IBM"))
+    data = DataCollector("stock").data_collector.get_daily_data("IBM")
+    first_n = dict(itertools.islice(data['Monthly Time Series'].items(), 10))
+    pprint.pprint(first_n)
