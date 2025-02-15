@@ -2,7 +2,6 @@ import uvicorn
 from typing import Dict, Any
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
 from fastapi import Response
 import json
 from service_modules.data_processor import StockDataProcessor
@@ -65,6 +64,8 @@ async def get_stock_data(symbol: str, time_series: str, use_mock: bool = True) -
 @app.get("/health")
 async def health_check():
     return {"status": "healthy"}
+
+
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
