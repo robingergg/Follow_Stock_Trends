@@ -37,16 +37,16 @@ async def get_stock_data(symbol: str, time_series: str, use_mock: bool = True) -
 
         # TODO: create a look-up table for retrieving time_series value dynamically
         if time_series == "monthly":
-            time_series_callback = processor.get_monthly_returns(symbol, use_mock=use_mock)
+            time_series_callback = processor.get_monthly_returns
         elif time_series == "weekly":
-            time_series_callback = processor.get_weekly_returns(symbol, use_mock=use_mock)
+            time_series_callback = processor.get_weekly_returns
         elif time_series == "daily":
-            time_series_callback = processor.get_daily_returns(symbol, use_mock=use_mock)
+            time_series_callback = processor.get_daily_returns
         else:
             raise ValueError(f"Invalid time series: {time_series}")
 
         if time_series_callback:
-            data = time_series_callback()
+            data = time_series_callback(symbol, use_mock=use_mock)
         else:
             raise ValueError(f"Invalid time series: {time_series}")
 
