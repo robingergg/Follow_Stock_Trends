@@ -35,9 +35,9 @@ class StockDataProcessor(DataProcessorBase):
 
     def _get_time_series_data(self, time_series: str, symbol: str, mock: str = None):
         if time_series == StockDataProcessor.TimeSeries.DAILY:
-            self.data = self.collector.data_collector.get_daily_data(symbol)
+            self.data = self.collector.data_collector.get_daily_data(symbol, mock=mock)
         elif time_series == StockDataProcessor.TimeSeries.WEEKLY:
-            self.data = self.collector.data_collector.get_weekly_data(symbol)
+            self.data = self.collector.data_collector.get_weekly_data(symbol, mock=mock)
         elif time_series == StockDataProcessor.TimeSeries.MONTHLY:
             self.data = self.collector.data_collector.get_monthly_data(symbol, mock=mock)
         else:
@@ -45,6 +45,8 @@ class StockDataProcessor(DataProcessorBase):
         
         return self.data
     
+
+    # TODO: extract time series functionality into one function
     def get_monthly_returns(self, symbol: str, use_mock: bool = False, display_cli: bool = False) -> dict:
         mock = None
         if use_mock:
@@ -58,9 +60,32 @@ class StockDataProcessor(DataProcessorBase):
             print(df)
         return self.data
     
-    # TODO: add weekly and daily returns
-            
+    def get_weekly_returns(self, symbol: str, use_mock: bool = False, display_cli: bool = False) -> dict:
+        mock = None
+        if use_mock:
+            mock = "mock_data/Weekly_data.txt"
+        self.data = self._get_time_series_data(StockDataProcessor.TimeSeries.WEEKLY, symbol, mock)
 
+        df = pd.DataFrame(self.data[self.weekly_series]).T.astype(float)
+        df = df.sort_index()
+        df["Weekly Return (%)"] = df["4. close"].pct_change() * 100
+        if display_cli:
+            print(df)
+        return self.data
+
+    def get_daily_returns(self, symbol: str, use_mock: bool = False, display_cli: bool = False) -> dict:
+        mock = None
+        if use_mock:
+            mock = "mock_data/Daily_data.txt"
+        self.data = self._get_time_series_data(StockDataProcessor.TimeSeries.DAILY, symbol, mock)
+
+        df = pd.DataFrame(self.data[self.daily_series]).T.astype(float)
+        df = df.sort_index()
+        df["Daily Return (%)"] = df["4. close"].pct_change() * 100
+        if display_cli:
+            print(df)
+        return self.data
+    
 if __name__ == "__main__":
     stock_data_processor = StockDataProcessor()
     stock_data_processor.get_monthly_returns("IBM", use_mock=True)

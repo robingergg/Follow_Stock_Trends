@@ -28,7 +28,7 @@ async def get_stock_data(symbol: str, time_series: str, use_mock: bool = True) -
     This endpoint is used to get the stock data for a given symbol and time series.
     Example call: 'http://localhost:8000/stock/IBM?time_series=monthly&use_mock=true'
     """
-
+    # TODO: add support for checking if valud symbol is given
     time_series_callback = None
     data = None
     try:
@@ -68,4 +68,3 @@ async def health_check():
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
-    # get_stock_data("IBM", "monthly", use_mock=True)
