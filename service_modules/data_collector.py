@@ -50,6 +50,7 @@ class CollectorBase:
 
         try:
             if mock:
+                print("DEBUG: Mock data used.")
                 response = self._mock_data(mock)
                 return response
             else:
@@ -138,7 +139,7 @@ class DataCollector(CollectorBase):
             proper_string = json.loads(proper_string.encode("utf-8"))
             return proper_string
 
-        def get_daily_data(self, symbol: str, method: str = "GET") -> dict:
+        def get_daily_data(self, symbol: str, method: str = "GET", mock: str = None) -> dict:
             """
             This method is responsible for getting the daily data for a given symbol.
 
@@ -149,14 +150,14 @@ class DataCollector(CollectorBase):
                 dict - The daily data for the given symbol.
             """
             endpoint = self.daily_endpoint.format(symbol)
-            return self.make_request(endpoint, method)
+            return self.make_request(endpoint, method, mock)
         
-        def get_weekly_data(self, symbol: str, method: str = "GET") -> dict:
+        def get_weekly_data(self, symbol: str, method: str = "GET", mock: str = None) -> dict:
             """
             This method is responsible for getting the weekly data for a given symbol.
             """
             endpoint = self.weekly_endpoint.format(symbol)
-            return self.make_request(endpoint, method)
+            return self.make_request(endpoint, method, mock)
         
         def get_monthly_data(self, symbol: str, method: str = "GET", mock: str = None) -> dict:
             """
