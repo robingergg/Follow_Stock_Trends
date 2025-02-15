@@ -2,6 +2,9 @@ import uvicorn
 from typing import Dict, Any
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from fastapi import Response
+import json
 from service_modules.data_processor import StockDataProcessor
 
 
@@ -20,7 +23,7 @@ async def root():
     return {"message": "Stock Data API"}
 
 @app.get("/stock/{symbol}")
-async def get_stock_data(symbol: str, time_series: str, use_mock: bool = True) -> Dict[str, Any]:
+async def get_stock_data(symbol: str, time_series: str, use_mock: bool = True) -> Dict[str, str]:
     """
     This endpoint is used to get the stock data for a given symbol and time series.
     Example call: 'http://localhost:8000/stock/IBM?time_series=monthly&use_mock=true'
@@ -29,10 +32,13 @@ async def get_stock_data(symbol: str, time_series: str, use_mock: bool = True) -
         # Collect data
         processor = StockDataProcessor()
 
-        # TODO: create a look-up table for retrieving time_series vlaue dynamically
+        # TODO: create a look-up table for retrieving time_series value dynamically
         if time_series == "monthly":
             data = processor.get_monthly_returns(symbol, use_mock=use_mock)
-            return data
+            response = Response(content=json.dumps(data), media_type="application/json")
+            # NOTE: adding headers for CORS as it seems that add_middle doesnt properly allows all origin
+            response.headers["Access-Control-Allow-Origin"] = "*"
+            return response
 
     # TODO: create more detaled error(s)
     except Exception as e:
