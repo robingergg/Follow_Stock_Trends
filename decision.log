@@ -1,0 +1,29 @@
+# Decision log
+
+## Tech used:
+
+- Python
+- FastAPI
+- PostgreSQL
+- Docker
+- React, JS, HTML, CSS
+
+
+## Why I used them:
+
+- I chosed python as the programming language, because this is the most important for you and because this is what I ahve the most experience with.
+- FastAPI was chosed, because it is fast and is more suitable with database queries than Flask for example.
+- I chosed PostgreSQL as my database, sicne this is what I am most familiar with and it is a good fit for the project.
+- Docker is a no brainer when it coems to containerization.
+- React, JS, HTML, CSS were chosed, because I wanted to use a modern and popular frontend framework and react is a very good choice for this.
+
+
+## Project choice
+
+The reason I choosed to solve the task - which is to visualize the stock trends -
+is it was interesting to me and it has a lot of data to work with and therefore a lot of potential for future improvements.
+
+You are able to improve it by displaying and analyzing different valeu of a single stock, or multiple stocks.
+Also it is easy to integrate Forex, Crypto, or any other asset.
+
+First I wanted to work with coffee data, but I quickly realized that it is not a good fit for this project and has less data than stock data.
