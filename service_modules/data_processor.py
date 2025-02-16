@@ -1,8 +1,7 @@
 import pandas as pd
 from enum import Enum
 
-# Add paths to PYTHONPATH here temporarly
-# When using Docker, it will be added automatically
+# TODO: add this path in Dockerfile
 import sys
 sys.path.append("service_modules")
 

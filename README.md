@@ -12,6 +12,14 @@ NOTE: This project was developed in WSL 2 on Windows 11 - Ubuntu 24.04.1 LTS.
 Recommended usage is only with the use of Docker on Linux or Linux like systems.
 
 
+## Mock data
+
+Alpha Vantage API has a limit of 25 requests per day, therefore I added a mock data to the project to use it unlimited.
+The user have the option to use mock data anytime either used with react or curl/CLI.
+
+Using CLI we need to set use_mock to true, see later at "Access app using curl/ CLI" section
+and by using react we need to check the checkbox "Use Mock Data" in the form.
+
 ## Technologies used
 
 - FastAPI
@@ -23,10 +31,10 @@ Recommended usage is only with the use of Docker on Linux or Linux like systems.
 
 ## Prerequisites
 
-- Docker: 
-- API key for Alpha Vantage - go to https://www.alphavantage.co/ and click on "Get free API key" button
+- Docker
+- API key for Alpha Vantage: go to https://www.alphavantage.co/ and click on "Get free API key" button
 - PostgreSQL database
-- Postgres database config set up - .env file
+- Postgres database config set up: .env file
 
 
 ### Install Docker and Dcoker Compose if not yet installed

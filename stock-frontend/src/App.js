@@ -14,6 +14,12 @@ function App() {
     console.log(`Fetching data for ${symbol} with time series ${timeSeries}`);
 
     console.log(`Using mock data: ${useMock}`);
+
+    if (!symbol) {
+      setError('Symbol is required, eg. IBM');
+      setLoading(false);
+      return;
+    }
     
 
     try {
